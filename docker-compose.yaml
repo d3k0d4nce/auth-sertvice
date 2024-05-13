@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+  postgres:
+    image: 'postgres:15'
+    container_name: postgres-bebriki
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    networks:
+      - mynetwork
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: app-bebriki
+    depends_on:
+      - postgres
+      - minio
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    networks:
+      - mynetwork
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio-bebriki
+    env_file:
+      - .env
+    command: server --address :9000 ~/minio --console-address :9090
+    ports:
+      - '9090:9090'
+      - '9000:9000'
+    volumes:
+      - minio-data:/minio
+    networks:
+      - mynetwork
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb myminio/bebriki;
+      /usr/bin/mc policy set public myminio/bebriki;
+      exit 0;
+      "
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local
+  minio-data:
+    driver: local

@@ -1,0 +1,55 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show_sql: true
+  mail:
+    host: smtp.mail.ru
+    port: 465
+    username: bebriki.2024@mail.ru
+    password: MpcfnG6FK7r3bdgTeChg
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            trust: "*"
+        connectiontimeout: 5000
+        timeout: 3000
+        writetimeout: 5000
+  main:
+    web-application-type: servlet
+  thymeleaf:
+    prefix: classpath:/templates/
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+
+application:
+  security:
+    jwt:
+      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      expiration: 86400000 # a day
+      refresh-token:
+        expiration: 604800000 # 7 days
+  mailing:
+    frontend:
+      activation-url: http://localhost:8080/auth/activate-account
+  minio:
+    bucket: bebriki
+    url: http://localhost:9000
+    accessKey: minioadmin
+    secretKey: minioadmin
+
+server:
+  port: 8080
